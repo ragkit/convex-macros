@@ -5,6 +5,9 @@ authors = ["Ragkit <support@ragkit.com>"]
 version = "0.0.2"
 edition = "2021"
 license = "MIT"
+documentation = "https://github.com/ragkit/convex-macros"
+repository = "https://github.com/ragkit/convex-macros"
+homepage = "https://github.com/ragkit/convex-macros"
 
 [dependencies]
 syn = { version = "2.0.53", features = ["full"] }
