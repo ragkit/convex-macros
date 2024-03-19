@@ -1,11 +1,11 @@
 [package]
 name = "ragkit_convex_macros"
 description = "Macros to help make Convex in Rust nice"
-authors = ["Ragkit <support@ragkit.com>"]
-version = "0.0.2"
+authors = ["Ragkit <hi@ragkit.com>"]
+version = "0.0.4"
 edition = "2021"
 license = "MIT"
-documentation = "https://github.com/ragkit/convex-macros"
+documentation = "https://docs.rs/ragkit_convex_macros/latest/ragkit_convex_macros/"
 repository = "https://github.com/ragkit/convex-macros"
 homepage = "https://github.com/ragkit/convex-macros"
 
