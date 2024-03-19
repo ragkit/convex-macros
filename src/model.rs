@@ -109,9 +109,9 @@ impl ConvexField {
     let ignore_attributes = quote! {
       #[allow(non_snake_case)]
     };
-    let struct_attributes = quote! {
-
-      #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
+    // Note: We need a custom serialize to avoid unions printing as objects.
+    let enum_struct_attributes = quote! {
+      #[derive(::serde::Deserialize, Clone, Debug)]
     };
 
     match &self.t {
@@ -126,6 +126,7 @@ impl ConvexField {
         let mut enum_kinds = Vec::new();
         let mut extract_arms = Vec::new();
         let mut json_arms: Vec<TokenStream> = Vec::new();
+        let mut serialize_arms: Vec<TokenStream> = Vec::new();
         let mut i = 0;
         for t in types {
           i += 1;
@@ -146,12 +147,18 @@ impl ConvexField {
                 json_arms.push(quote! {
                   | #struct_name::#branch_name => ::serde_json::Value::Null,
                 });
+                serialize_arms.push(quote! {
+                  | #struct_name::#branch_name => ().serialize(serializer),
+                });
               } else {
                 enum_kinds.push(quote! {
                   #branch_name(#branch_type),
                 });
                 json_arms.push(quote! {
                   | #struct_name::#branch_name(value) => ::serde_json::json!(value),
+                });
+                serialize_arms.push(quote! {
+                  | #struct_name::#branch_name(ref value) => value.serialize(serializer),
                 });
               }
             },
@@ -161,6 +168,9 @@ impl ConvexField {
               });
               json_arms.push(quote! {
                 | #struct_name::#branch_name(value) => ::serde_json::json!(value),
+              });
+              serialize_arms.push(quote! {
+                | #struct_name::#branch_name(ref value) => value.serialize(serializer),
               });
             },
           };
@@ -241,9 +251,21 @@ impl ConvexField {
 
         structs.push(quote! {
           #ignore_attributes
-          #struct_attributes
+          #enum_struct_attributes
           pub enum #struct_name {
             #( #enum_kinds )*
+          }
+        });
+
+        impls.push(quote! {
+          #ignore_attributes
+          impl ::serde::Serialize for #struct_name {
+            fn serialize<S>(&self, serializer: S) -> ::core::result::Result<S::Ok, S::Error>
+            where S: ::serde::Serializer {
+              match *self {
+                #( #serialize_arms )*
+              }
+            }
           }
         });
 
@@ -312,7 +334,7 @@ impl ConvexField {
       #[allow(non_snake_case)]
     };
     let struct_attributes = quote! {
-      #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
+      #[derive(::serde::Serialize, ::serde::Deserialize, Clone, Debug)]
     };
     let mut structs = Vec::new();
     let mut rendered_fields = Vec::new();
