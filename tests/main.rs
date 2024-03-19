@@ -3,21 +3,21 @@ use maplit::btreemap;
 use ragkit_convex_macros::convex_model;
 use serde_json::json;
 
-convex_model!(Example {
-  one: v.id("table"),
-  two: v.null(),
-  three: v.int64(),
-  four: v.number(),
-  five: v.boolean(),
-  six: v.string(),
-  seven: v.literal("seven"),
-  eight: v.literal(false),
-  nine: v.literal(9),
-  ten: v.union(v.string(), v.number()),
-});
-
 #[test]
 fn example() {
+  convex_model!(Example {
+    one: v.id("table"),
+    two: v.null(),
+    three: v.int64(),
+    four: v.number(),
+    five: v.boolean(),
+    six: v.string(),
+    seven: v.literal("seven"),
+    eight: v.literal(false),
+    nine: v.literal(9),
+    ten: v.union(v.string(), v.number()),
+  });
+
   let convex_data = Value::Object(btreemap! {
     "one".into() => Value::String("123fakeid".into()),
     "two".into() => Value::Null,
@@ -113,4 +113,49 @@ fn example3() {
 
   let actual_json_data = json!(model);
   assert_eq!(expected_json_data, actual_json_data);
+}
+
+#[test]
+fn readme() {
+  convex_model!(User {
+    _id: v.id("users"),
+    name: v.string(),
+    age: v.optional(v.int64()),
+    platform: v.union(
+      v.object({
+        platform: v.literal("google"),
+        verified: v.boolean(),
+      }),
+      v.object({
+        platform: v.literal("github"),
+        username: v.string(),
+      }),
+    ),
+  });
+
+  let user = User::from_convex_value(&Value::Object(btreemap! {
+    "_id".into() => Value::String("1234".into()),
+    "name".into() => Value::String("Alice".into()),
+    "age".into() => Value::Int64(42),
+    "platform".into() => Value::Object(btreemap! {
+      "platform".into() => Value::String("github".into()),
+      "username".into() => Value::String("alicecodes".into()),
+    }),
+  }))
+  .expect("it should parse");
+
+  assert_eq!("1234", user._id);
+  assert_eq!("alicecodes", user.platform.as_2().unwrap().username);
+  assert_eq!(
+    json!({
+      "_id": "1234",
+      "name": "Alice",
+      "age": 42,
+      "platform": {
+        "platform": "github",
+        "username": "alicecodes",
+      },
+    }),
+    json!(user),
+  );
 }

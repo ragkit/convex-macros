@@ -104,6 +104,7 @@ impl Parse for ConvexField {
 impl ConvexField {
   pub fn print(&self) -> Vec<TokenStream> {
     let struct_name = self.name.to_struct_name();
+    let struct_name_str = struct_name.to_string();
     let mut structs = Vec::new();
     let mut impls = Vec::new();
     let ignore_attributes = quote! {
@@ -111,7 +112,7 @@ impl ConvexField {
     };
     // Note: We need a custom serialize to avoid unions printing as objects.
     let enum_struct_attributes = quote! {
-      #[derive(::serde::Deserialize, Clone, Debug)]
+      #[derive(::serde::Deserialize, Clone, Debug, PartialEq)]
     };
 
     match &self.t {
@@ -127,11 +128,15 @@ impl ConvexField {
         let mut extract_arms = Vec::new();
         let mut json_arms: Vec<TokenStream> = Vec::new();
         let mut serialize_arms: Vec<TokenStream> = Vec::new();
+        let mut as_fns: Vec<TokenStream> = Vec::new();
         let mut i = 0;
         for t in types {
           i += 1;
           let branch_name =
             Ident::new(format!("Variant{}", i).as_str(), Span::call_site());
+          let branch_name_str = branch_name.to_string();
+          let as_name =
+            Ident::new(format!("as_{}", i).as_str(), Span::call_site());
           let full_branch_name = Ident::new(
             format!("{}Variant{}", struct_name, i).as_str(),
             Span::call_site(),
@@ -150,6 +155,19 @@ impl ConvexField {
                 serialize_arms.push(quote! {
                   | #struct_name::#branch_name => ().serialize(serializer),
                 });
+                as_fns.push(quote! {
+                  pub fn #as_name(&self) -> ::core::result::Result<(), ::anyhow::Error> {
+                    if let #struct_name::#branch_name = self {
+                      ::core::result::Result::Ok(())
+                    } else {
+                      ::core::result::Result::Err(::anyhow::anyhow!(
+                        "Expected variant {}::{}",
+                        #struct_name_str,
+                        #branch_name_str,
+                      ))
+                    }
+                  }
+                });
               } else {
                 enum_kinds.push(quote! {
                   #branch_name(#branch_type),
@@ -159,6 +177,19 @@ impl ConvexField {
                 });
                 serialize_arms.push(quote! {
                   | #struct_name::#branch_name(ref value) => value.serialize(serializer),
+                });
+                as_fns.push(quote! {
+                  pub fn #as_name(&self) -> ::core::result::Result<#branch_type, ::anyhow::Error> {
+                    if let #struct_name::#branch_name(value) = self {
+                      ::core::result::Result::Ok(value.clone())
+                    } else {
+                      ::core::result::Result::Err(::anyhow::anyhow!(
+                        "Expected variant {}::{}",
+                        #struct_name_str,
+                        #branch_name_str,
+                      ))
+                    }
+                  }
                 });
               }
             },
@@ -171,6 +202,20 @@ impl ConvexField {
               });
               serialize_arms.push(quote! {
                 | #struct_name::#branch_name(ref value) => value.serialize(serializer),
+              });
+              // TODO: Probably doing too much cloning.
+              as_fns.push(quote! {
+                pub fn #as_name(&self) -> ::core::result::Result<#full_branch_name, ::anyhow::Error> {
+                  if let #struct_name::#branch_name(value) = self {
+                    ::core::result::Result::Ok(value.clone())
+                  } else {
+                    ::core::result::Result::Err(::anyhow::anyhow!(
+                      "Expected variant {}::{}",
+                      #struct_name_str,
+                      #branch_name_str,
+                    ))
+                  }
+                }
               });
             },
           };
@@ -282,6 +327,10 @@ impl ConvexField {
                 },
               }
             }
+
+            #(
+              #as_fns
+            )*
           }
         });
 
@@ -334,7 +383,7 @@ impl ConvexField {
       #[allow(non_snake_case)]
     };
     let struct_attributes = quote! {
-      #[derive(::serde::Serialize, ::serde::Deserialize, Clone, Debug)]
+      #[derive(::serde::Serialize, ::serde::Deserialize, Clone, Debug, PartialEq)]
     };
     let mut structs = Vec::new();
     let mut rendered_fields = Vec::new();
