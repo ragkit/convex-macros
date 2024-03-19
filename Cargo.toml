@@ -2,7 +2,7 @@
 name = "ragkit_convex_macros"
 description = "Macros to help make Convex in Rust nice"
 authors = ["Ragkit <support@ragkit.com>"]
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 license = "MIT"
 
