@@ -1,0 +1,22 @@
+[package]
+name = "ragkit_convex_macros"
+description = "Macros to help make Convex in Rust nice"
+authors = ["Ragkit <support@ragkit.com>"]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+syn = { version = "2.0.53", features = ["full"] }
+quote = "1.0"
+proc-macro2 = "1.0"
+
+[lib]
+proc-macro = true
+
+[dev-dependencies]
+anyhow = "1.0.80"
+convex = "0.6.0"
+maplit = "1.0.2"
+serde = "1.0.185"
+serde_json = "1.0"
