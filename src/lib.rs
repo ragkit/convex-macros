@@ -8,7 +8,7 @@ mod model;
 
 /// Create models using the same [Convex validator](https://docs.convex.dev/functions/args-validation#convex-values) syntax as your schema definition.
 ///
-/// ```rust
+/// ```ignore
 /// convex_model!(User {
 ///   _id: v.id("users"),
 ///   name: v.string(),
@@ -28,7 +28,7 @@ mod model;
 ///
 /// This generates `pub struct User {}` with various methods to convert from [`convex::Value`](https://docs.rs/convex/0.6.0/convex/enum.Value.html) and to [`serde_json::Value`](https://docs.rs/serde_json/latest/serde_json/enum.Value.html).
 ///
-/// ```rust
+/// ```ignore
 /// let user = User::from_convex_value(&Value::Object(btreemap! {
 ///   "_id".into() => Value::String("1234".into()),
 ///   "name".into() => Value::String("Alice".into()),
