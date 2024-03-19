@@ -59,10 +59,56 @@ fn example() {
     "seven": "seven",
     "eight": false,
     "nine": 9,
-    // TODO: Fix this.
-    "ten": {
-      "Variant2": 10.0
-    },
+    "ten": 10.0,
+  });
+
+  let actual_json_data = json!(model);
+  assert_eq!(expected_json_data, actual_json_data);
+}
+
+convex_model!(BasicUnion { value: v.union(v.string(), v.number()) });
+
+#[test]
+fn example2() {
+  let convex_data = Value::Object(btreemap! {
+    "value".into() => Value::String("hi".into()),
+  });
+
+  let model = BasicUnion::from_convex_value(&convex_data)
+    .expect("Model should parse data");
+
+  if let BasicUnionValue::Variant1(value) = &model.value {
+    assert_eq!("hi", value);
+  } else {
+    panic!("Expected 10.0")
+  }
+
+  let expected_json_data = json!({
+    "value": "hi",
+  });
+
+  let actual_json_data = json!(model);
+  assert_eq!(expected_json_data, actual_json_data);
+}
+
+convex_model!(NullUnion { value: v.union(v.string(), v.null()) });
+
+#[test]
+fn example3() {
+  let convex_data = Value::Object(btreemap! {
+    "value".into() => Value::Null,
+  });
+
+  let model = NullUnion::from_convex_value(&convex_data)
+    .expect("Model should parse data");
+
+  if let NullUnionValue::Variant2 = &model.value {
+  } else {
+    panic!("Expected Unit")
+  }
+
+  let expected_json_data = json!({
+    "value": null,
   });
 
   let actual_json_data = json!(model);
