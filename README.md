@@ -8,7 +8,7 @@ Macros to help make Convex in Rust nice
 
 ```toml
 [dependencies]
-ragkit_convex_macros = "0.0.2"
+ragkit_convex_macros = "0.0.3"
 
 # Required by code this macro generates.
 anyhow = "1.0.80"
