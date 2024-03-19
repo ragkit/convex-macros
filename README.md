@@ -1,6 +1,6 @@
 # convex-macros
 
-[![CI Badge](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml/badge.svg)](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml)
+[![Crates.io Badge](https://img.shields.io/crates/v/ragkit_convex_macros)](https://img.shields.io/crates/v/ragkit_convex_macros) [![CI Badge](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml/badge.svg)](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml)
 
 Macros to help make Convex in Rust nice
 
@@ -71,10 +71,27 @@ assert_eq!(
 
 ## Features
 
-- `let user = User::from_convex_value(value)?;` to parse a value from Convex client
-- `json!(user)` to serialize as json
-- Discriminated unions are automatically handled
-- Helper functions for each branch are also exposed: `user.platform.as_2()?.username`
+- `let user = User::from_convex_value(value)?;` to parse a value from Convex client.
+- `json!(user)` to serialize as json.
+- Discriminated unions are automatically handled.
+- Helper functions for each union branch: `user.platform.as_2()?.username`.
+
+## Validator List
+
+| Validator Name           | Rust Type          | Notes                                            |
+| ------------------------ | ------------------ | ------------------------------------------------ |
+| `v.string()`             | `String`           |                                                  |
+| `v.id("tableName")`      | `String`           | Ids are not validated against your tables        |
+| `v.null()`               | `()`               |                                                  |
+| `v.int64()`              | `i64`              |                                                  |
+| `v.number()`             | `f64`              |                                                  |
+| `v.boolean()`            | `bool`             |                                                  |
+| `v.optional(...)`        | `Option<T>`        |                                                  |
+| `v.union(...)`           | Generated `enum`   |                                                  |
+| `v.object({field: ...})` | Generated `struct` | Field names can't be rust keywords (like `type`) |
+| `v.bytes()`              | not implemented    |                                                  |
+| `v.array(values)`        | not implemented    |                                                  |
+| `v.any()`                | not implemented    |                                                  |
 
 ## Limitations
 
@@ -84,6 +101,7 @@ assert_eq!(
 - Union variant names are always named like: `Variant1`, `Variant2`, etc.
 - The first acceptable union branch will be used if there are multiples that could validly parse data.
 - This package generates code that expects `anyhow`, `convex`, `serde`, and `serde_json` to be available.
+- Ints and Floats may be coerced into each other. Please test out your use cases and open an issue if you believe the behavior should change.
 
 # License
 
