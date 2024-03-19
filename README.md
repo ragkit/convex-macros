@@ -1,6 +1,6 @@
 # convex-macros
 
-[![Crates.io Badge](https://img.shields.io/crates/v/ragkit_convex_macros)](https://img.shields.io/crates/v/ragkit_convex_macros) [![CI Badge](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml/badge.svg)](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml)
+[![CI Badge](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml/badge.svg)](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml) [![License Badge](https://img.shields.io/badge/license-MIT-blue)](./LICENSE) [![Crates.io Badge](https://img.shields.io/crates/v/ragkit_convex_macros)](https://img.shields.io/crates/v/ragkit_convex_macros)
 
 Macros to help make Convex in Rust nice
 
@@ -8,7 +8,7 @@ Macros to help make Convex in Rust nice
 
 ```toml
 [dependencies]
-ragkit_convex_macros = "0.0.3"
+ragkit_convex_macros = "0.0.4"
 
 # Required by code this macro generates.
 anyhow = "1.0.80"
