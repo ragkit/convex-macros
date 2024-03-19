@@ -1,6 +1,6 @@
 # convex-macros
 
-[![CI Badge](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml/badge.svg)](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml) [![License Badge](https://img.shields.io/badge/license-MIT-blue)](./LICENSE) [![Crates.io Badge](https://img.shields.io/crates/v/ragkit_convex_macros)](https://img.shields.io/crates/v/ragkit_convex_macros)
+[![CI Badge](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml/badge.svg)](https://github.com/ragkit/convex-macros/actions/workflows/ci.yml) [![License Badge](https://img.shields.io/badge/license-MIT-blue)](./LICENSE) [![Crates.io Badge](https://img.shields.io/crates/v/ragkit_convex_macros)](https://crates.io/crates/ragkit_convex_macros)
 
 Macros to help make Convex in Rust nice
 
